@@ -174,6 +174,18 @@ pub fn _wgetch(w: *mut WINDOW) -> Option<Input> {
     }
 }
 
+pub fn _wgetch_raw(w: WINDOW) -> Option<Input> {
+    let i = unsafe { wgetch(w) };
+    if i < 0 {
+        None
+    } else {
+        Some(to_special_keycode(i).unwrap_or_else(|| {
+            Input::Unknown(i)
+        }))
+    }
+}
+
+
 pub fn _ungetch(input: &Input) -> i32 {
     match *input {
         Input::Character(c) => {

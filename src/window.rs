@@ -34,6 +34,18 @@ impl Window {
         unsafe { curses::waddstr(self._window, s.as_ptr()) }
     }
 
+    /// Write all the byte of the array to the given window.
+    ///
+    pub fn addbytes(&self, bytes: &[u8]) -> i32 {
+        unsafe {
+            curses::waddnstr(
+                self._window,
+                bytes.as_ptr() as *const i8,
+                bytes.len() as i32,
+            )
+        }
+    }
+
     /// Write at most length characters; if length is negative, then the entire string will be
     /// added.
     pub fn addnstr<T: AsRef<str>>(&self, string: T, length: usize) -> i32 {
@@ -282,6 +294,12 @@ impl Window {
     /// returned.
     pub fn getch(&self) -> Option<Input> {
         platform_specific::_wgetch(self._window)
+    }
+
+    /// similar to getch, but do not try decoding into UTF-8.
+    /// Instead, always return Input::Unknown or special keycode
+    pub fn getch_raw(&self) -> Option<Input> {
+        platform_specific::_wgetch_raw(self._window)
     }
 
     /// Return the current x coordinate of the cursor
